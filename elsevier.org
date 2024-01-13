@@ -2,23 +2,41 @@
 # -*- mode: org -*-
 
 #+TITLE: The Elsevier LaTeX Class in Org-Mode
-#+AUTHOR: Lucas Mello Schnorr
+#+SUBTITLE: (The modification of the Schnorr's original template)
+#+AUTHOR: Lucas Mello Schnorr, MB 
 
 #+STARTUP: overview indent
-#+LANGUAGE: pt-br
+#+LANGUAGE: en
 #+OPTIONS: H:3 creator:nil timestamp:nil skip:nil toc:nil num:t ^:nil ~:~
 #+OPTIONS: author:nil title:nil date:nil
 #+TAGS: noexport(n) deprecated(d) ignore(i)
-#+EXPORT_SELECT_TAGS: export
-#+EXPORT_EXCLUDE_TAGS: noexport
+#+EXPORT_SELECT_TAGS: export 
+#+EXPORT_EXCLUDE_TAGS: noexport 
+
+
+
+# ##### MB note: additional tags for two alternative citation engines
+#+TAGS: { @bibtexStyle(b) @orgciteStyle(o) }
+#+EXCLUDE_TAGS: @bibtexStyle noexport
+#+OPTIONS: tags:nil
+
 
 #+LATEX_CLASS: ELSEVIER
-#+LATEX_CLASS_OPTIONS: [final,12pt]
-#+LATEX_HEADER: \usepackage[utf8]{inputenc}
-#+LATEX_HEADER: \usepackage[T1]{fontenc}
-#+LATEX_HEADER: \usepackage{lineno}
-#+LATEX_HEADER: \linenumbers
-#+LATEX_HEADER: \modulolinenumbers[1]
+
+# ##### MB note: nicer/default style of the pdf
+# #+LATEX_CLASS_OPTIONS: [final,12pt]
+#+LATEX_CLASS_OPTIONS: [sort&compress,final,onecolumn, 5p,times]
+
+# ##### MB note: if you want to use engraved you need to disable this package...
+# #+LATEX_HEADER: \usepackage{lineno}
+# #+LATEX_HEADER: \linenumbers
+# #+LATEX_HEADER: \modulolinenumbers[1]
+
+# ##### MB note: these packages are included in default =org-latex-default-packages-alist=
+# #+LATEX_HEADER: \usepackage[utf8]{inputenc}
+# #+LATEX_HEADER: \usepackage[T1]{fontenc}
+
+
 #+LATEX_HEADER: \usepackage{color}	
 #+LATEX_HEADER: \usepackage{hyperref,xspace}
 #+LATEX_HEADER: \usepackage[tight,footnotesize]{subfigure}
@@ -42,11 +60,46 @@
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+#+end_src
+
+** Citation engine 
+<<sec:citation-engine>>
+*** Citation - option 1: =bibtex= 
+If you want to use standard =bibtex= citation approach you need to
+uncomment this section and section [[citation-bibtex-include-bibliography]].
+
+#+begin_src emacs-lisp :results output :session :exports both
+; setting pdflatex process for bibtex citation approach
+(setq org-latex-pdf-process '("pdflatex -shell-escape -interaction=nonstopmode %f"
+                              "bibtex %b" 
+                              "pdflatex -shell-escape -interaction=nonstopmode %f" 
+                              "pdflatex -shell-escape -interaction=nonstopmode --synctex=-1 %f"))
 #+end_src
 
 #+RESULTS:
 
-* *The Paper*                                                       :ignore:
+*** Citation - option 2: =cite-org= 
+If you want to use =cite-org= citation style and approach you need to
+uncomment:
+- this section and
+- section 
+
+# ##### MB note: uncomment two lines below if you use cite-org package for citations
+#+BIBLIOGRAPHY: ./refs.bib
+#+CITE_EXPORT: csl cissic-elsevier-american-chemical-society-without-doi.csl
+
+
+#+begin_src emacs-lisp :results output :session :exports both
+; setting latex compilation for cite-org citation approach
+(setq org-latex-pdf-process "latexmk -f -pdf -interaction=nonstopmode -shell-escape -output-directory=%o %f")
+(setq org-latex-pdf-process '("pdflatex -shell-escape -interaction=nonstopmode %f"
+                              "bibtex %b" 
+                              "pdflatex -shell-escape -interaction=nonstopmode %f" 
+                              "pdflatex -shell-escape -interaction=nonstopmode --synctex=-1 %f"))
+#+end_src
+
+* *The Paper (preamble/configurations)*                              :ignore:
 ** Latex configurations                                             :ignore:
 #+BEGIN_EXPORT latex
 \journal{Information Sciences}
@@ -97,7 +150,14 @@ F-38000 Grenoble -- France\\
 
 #+LaTeX: \begin{abstract}
 
-Put the abstract here.
+Put your abstract here.
+
+This repository is a modification of Schnorr's original document available
+on [[https://github.com/schnorr/elsevierorg][his github repository]].
+This work introduces the possibility of using the new =org-mode= way 
+of citing, namely - =org-cite=, still letting one to use classic,
+more latexian =bibtex= approach. The details are explained in
+section [[sec:customization]].
 
 #+LaTeX: \end{abstract}
 
@@ -134,9 +194,11 @@ Put the abstract here.
 #+latex: \end{keyword}
 *** Maketitle                                                      :ignore:
 #+LaTeX: \maketitle
+* *The Paper (content)*                                         :ignore:
+
 ** Introduction
 
-This is just an example to show how Orgmode\cite{orgmode} can be
+This is just an example to show how Orgmode can be
 neatly used to write papers following the Elsevier latex style. Feel
 free to modify and distributed this as you wish.
 
@@ -154,27 +216,160 @@ articles using OrgMode, please visit the following [[https://github.com/alegrand
 ** Related Work and Motivation
 \label{sec.relatedwork}
 
-Check this paper\cite{schnorr2013visualizing} about how you need to
-semantically aggregate data.
 
 ** Your Great Contribution to Computer Science
 \label{sec.proposal}
 ** Your Super Results
-** Conclusion
+** Description of MB's Customizations  <<sec:customization>>
+*** TODO Bibliography
+
+**** Section Test                                           :@bibtexStyle:
+
+lalala 
+
+**** Section Test 2                                        :@orgciteStyle:
+
+bababa
+
+**** TODO Using custom bibliography styles
+Problems with reading bibliography styles from working directory.
+I just changed =elsarticle-harv= in Section into =plain=.
+
+**** Compilation process (2DELETE because it's already described in [ [sec:citation-engine] ] ??)
+
+***** Settings for =bibtex= (default Schnorr's exporter)   :@bibtexStyle:
+If you want to use default =bibtex= bibliography backend it's
+reasonable to add:
+#+begin_src elisp :eval no 
+  (setq org-latex-pdf-process '("pdflatex -interaction nonstopmode %f" "bibtex %b" "pdflatex -interaction nonstopmode %f" "pdflatex -interaction nonstopmode --synctex=-1 %f"))
+#+end_src
+
+then all you need to do is to add:
+#+begin_src org
+  #+LATEX: \bibliographystyle{plain}
+  #+LATEX: \bibliography{refs} % where refs is a ref.bib file on your disk
+#+end_src
+at the end of the file.
+
+in Section ''Elsevier configuration for org export + ignore tag (Start Here)''
+(visible only in org source file, not exported in this pdf)
+in case the current value of =org-latex-pdf-process= is different.
+Otherwise you may encounter errors during compilation.
+
+
+****** Test
+
+After tangling bib file from section [ [bib-file-to-tangle] ]
+citations are accesible with the following style:
+
+Citations in =bibtexStyle=:
+
+Check this paper\cite{schnorr2013visualizing} about how you need to
+semantically aggregate data.
+This is just an example to show how Orgmode\cite{orgmode} can be used.
+
+
+***** TODO Settings for =org-cite=:                       :@orgciteStyle:
+
+#+begin_src emacs-lisp :eval no
+; setting latex compilation for cite-org citation approach
+(setq org-latex-pdf-process "latexmk -f -pdf -%latex -interaction=nonstopmode -output-directory=%o %f")
+;; ; ; ; ;; ;; ; ;(setq org-latex-pdf-process '("pdflatex -interaction nonstopmode %f" "bibtex %b" "pdflatex -interaction nonstopmode %f" "pdflatex -interaction nonstopmode --synctex=-1 %f"))
+#+end_src
+
+****** Test
+
+Citations in =orgciteStyle=:
+
+[cite:@orgmode]
+
+
+*** Dealing with internal references
+Reference to this section:
+1. [[sec:customization]]
+
+*** POSTPONED Other problems
+**** POSTPONED undefined references-citations warning 
+This is probably the problem with emacs, which seems to gather all
+the warnings that occur during =org-latex-pdf-process= and
+displays them after the process is finished.
+You may see something like:
+#+begin_src sh :eval no
+pdf file produced with warnings: [undefined reference] [undefined citattion]
+#+end_src
+although all the references and citations are properly numbered.
+
+The problem occurs because these warnings appear during the first iteration of
+=pdflatex=-ing, the next =pdflatex= compilations, after
+processing with =bibtex= are without these warnings.
+
+You may mimic this situation if you run:
+#+begin_src sh :eval no
+pdflatex elsevier # + flags that need to be passed to have compilation working 
+bibtex elsevier
+pdflatex elsevier
+pdflatex elsevier
+#+end_src
+
+The above commands may also be used to check the correctness
+of the paper (last pdflatex run should raise no warnings).
+
+**** COMMENT WARNING!!!: Conflict between =engraved= and =lineno= latex package
+# By default Schnorr's template had =lineno= latex package
+# included. In this way you could have lines numbered when exporting
+# to pdf.
+# However there exist some conflict between =lineno= and =engraved=
+# listing backend for org-mode which I'm currently using.
+# That's why lines with =lineno= needs to be commented out from
+# the preamble of this file.
+
+# It should be noted, that it can be reenabled if you write
+# a document without =#+begin_src= blocks (or if you
+# use other listings backends (minted, verbatim...).
+
+
+
+
+
+** Conclusions
+
 ** Acknowledgments                                                  :ignore:
 
 #+LATEX:\section*{Acknowledgements}
 
 Who paid for this?
 
-** References                                                        :ignore:
+** References                                                 :ignore:
+<<sec:references>>
 
 # See next section to understand how refs.bib file is created.
 
-#+LATEX: \bibliographystyle{elsearticle-harv}
+
+*** Citation - option 1: =bibtex=                     :ignore:@bibtexStyle:
+<<citation-bibtex-include-bibliography>>
+
+# ### MB note: uncomment two lines below if you use bibtex citation approach
+#+LATEX: \bibliographystyle{plain}
 #+LATEX: \bibliography{refs}
+  
+
+
+*** Citation - option 2: =cite-org=                  :ignore:@orgciteStyle:
+
+# ### MB note:  setting latex compilation for cite-org citation approach
+#+LATEX:\section*{References}
+#+PRINT_BIBLIOGRAPHY: 
+
+
+
+
+
+
+
+
 
 * Bib file is here                                                 :noexport:
+<<bib-file-to-tangle>>
 
 Tangle this file with C-c C-v t
 
@@ -202,6 +397,12 @@ Tangle this file with C-c C-v t
   pages={149--162},
   year={2013},
   publisher={Springer}
+}
+
+@misc{Schnorr-repo,
+  title = {Elsevier LaTeX in Org-Mode},
+  urldate = {2024-01-13},
+  howpublished = {https://github.com/schnorr/elsevierorg}
 }
 
 
