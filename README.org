@@ -1,5 +1,10 @@
 * Elsevier LaTeX in Org-Mode
 
+This is the modification of the template authored by Lucas M. Schnorr.
+It introduces =org-cite= - [[https://orgmode.org/manual/Citations.html][a convenient way of handling citations]]
+and presents different ways of refering to manuscript items like floats, bibliography entries etc.
+
+
 The [[https://www.elsevier.com/authors/author-schemas/latex-instructions][Elsevier LaTeX template]] in Org-Mode, just type make.  Be aware
 that this example is compatible with OrgMode 9.*. We won't recommend
 use with earlier versions.  For a detailed explanation on why and how
