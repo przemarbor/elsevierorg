@@ -14,16 +14,6 @@
 #+EXPORT_EXCLUDE_TAGS: noexport 
 
 
-
-# ##### MB note: additional tags for two alternative citation engines
-#+TAGS: { @bibtexStyle(b) @orgciteStyle(o) }
-# ##### MB note: exclude the style you do NOT want to use by adding it to EXCLUDEd_TAGS
-# #####    - if you want to use bibtex-like citing style, put @orgciteStyle in the line below
-# #####    - if you want to use org-cite citing engine, put @bibtexStyle in the line below
-#+EXCLUDE_TAGS: @orgciteStyle noexport
-#+OPTIONS: tags:nil
-
-
 #+LATEX_CLASS: ELSEVIER
 
 # ##### MB note: nicer/default style of the pdf
@@ -89,12 +79,25 @@ separately for different types of items (tables, images, etc.)
 
 ** Bibliography/citation engine
 
-*** Citation - option 2: =cite-org=                  :ignore:@orgciteStyle:
+# ##### MB note: additional tags for two alternative citation engines
+#+OPTIONS: tags:nil
+#+TAGS: { @orgciteEngine(o) purelatexEngine(b)}
+# ##### MB note: exclude the style you do NOT want to use by adding it to EXCLUDEd_TAGS
+# #####    - if you want to use bibtex-like citing style, put @orgciteEngine in the line below
+# #####    - if you want to use org-cite citing engine, put purelatexEngine in the line below
+#+EXCLUDE_TAGS: purelatexEngine noexport
+
+*** Citation - option 1: =cite-org=                 :ignore:@orgciteEngine:
+# ##### MB note: For details have look here:
+# #####          - https://orgmode.org/manual/Citation-export-processors.html
+# #####          - https://www.overleaf.com/learn/latex/Bibtex_bibliography_styles#Table_of_stylename_values
+# ##### Provided choosing bibtex processor you may also use styles 
+# ##### added in this repository: elsarticle-harv, elsarticle-num-names, elsarticle-num
 
 # ### MB note:  setting latex compilation for cite-org citation approach
 #+BIBLIOGRAPHY: ./refs.bib
-#+CITE_EXPORT: csl cissic-elsevier-american-chemical-society-without-doi.csl
-
+# Choosing style defined in ~/Zotero/styles #+CITE_EXPORT: csl elsevier-american-chemical-society-without-doi.csl
+#+CITE_EXPORT: bibtex elsarticle-num
 
 
 * *The Paper (preamble/configurations)*                              :ignore:
@@ -249,6 +252,17 @@ to floats:
 =latex=-like scheme or org-mode =#+NAME= tag.
 Choose the one you like more and be consistent.
 
+
+***** *Example of preferred way of refering to floats*
+#+NAME:   tab:A
+#+CAPTION: =#+NAME=-tagged table
+| XX | YY |
+|  1 |  2 |
+
+org-mode =[ [= =] ]= refrence to Table [[tab:A]]. 
+
+***** Example of other =org-ref= way of refering to floats
+
 #+begin_export latex
 \begin{table}[htbp]
 \centering
@@ -257,23 +271,19 @@ A & a\\[0pt]
 1 & 2\\[0pt]
 \end{tabular}
 \caption{label-tagged table}
-\label{tab:A}
+\label{tab:B}
 \end{table}
 #+end_export
 
-#+NAME:   tab:B
-#+CAPTION: =#+NAME=-tagged table
-| B | b |
-| 1 | 2 |
+ Org-ref =latex=-style reference to Table: ref:tab:B.
 
-Example:
-- Org-ref =latex=-style reference to Table: ref:tab:A, and
-- org-mode =[ [= =] ]= refrence to Table [[tab:B]]. 
 
 
 **** Example of equation label/reference scheme
 When it comes to equations there's only one working way of referencing
 to equations, since =#+NAME= labels are not working with =org-ref= for me.
+
+***** *Example of preferred way of refering to equations*
 
 #+begin_export latex
 \begin{equation}
@@ -282,6 +292,10 @@ E=mc^2
 \end{equation}
 #+end_export
 
+org-ref to =\label= reference: eqref:Eq:emc2-label
+
+***** (NOT WORKING) Example of other =org-ref= way of refering to floats
+
 #+NAME: Eq:emc2-name
 #+begin_export latex
 \begin{equation}
@@ -289,14 +303,11 @@ E=mc^2
 \end{equation}
 #+end_export
 
-Example: 
-- org-ref to =\label= reference: eqref:Eq:emc2-label
 - org-ref reference to the second equation labelled by =#+NAME= tag is currently *not working* for me: ref:Eq:emc2-name
 
-*** TODO Bibliography
+*** Bibliography - two ways of handling citations
 When it comes to handling bibliography we also introduce some new
 features.
-
 Firstly, we include explicit definition of latex compilation process 
 in the first section of the document in the line:
 
@@ -309,7 +320,7 @@ Secondly, we wanted to use the newer citing engine =org-cite=.
 In order to let one conveniently use any of them we decided on defining two
 local-buffer tags:
 
-=@bibtexStyle= and =@orgciteStyle=. 
+=purelatexEngine= and =@orgciteEngine=. 
 
 If you want to use one of them, you need to put the other one in the line with
 =#+EXCLUDE_TAGS:= (the beginning of this file).
@@ -317,8 +328,8 @@ If you want to use one of them, you need to put the other one in the line with
 \noindent *COMMENT*: Do remember to put excluded tag *before* =noexport= tag
 (It does not work otherwise.).
 
-Do decide which citing method you prefer, put appropriate (the other
-one to decided on) tag in =#+EXCLUDE_TAGS:=, and cite bibliography
+Do decide which citing method you prefer, write the tag name of the other one
+in =#+EXCLUDE_TAGS:=, and cite bibliography
 items as it is presented below.
 
 *VERY IMPORTANT COMMENT!!!*:
@@ -333,17 +344,7 @@ the list of all your bibliography items defined in
 your bib-file. You can conveniently select appropriate one from the list.
 This feature is not available for =bibtex=-like style.
 
-**** Details on implementing =bibtex=-like style
-After setting =org-latex-pdf-process= variable (which is done in the
-preamble of this document
-you only need to add:
-#+begin_src org
-  #+LATEX: \bibliographystyle{plain}
-  #+LATEX: \bibliography{refs} % where refs is a ref.bib file on your disk
-#+end_src
-at the end of the file.
-
-**** Details on implementing =org-cite= engine
+**** *Details on implementing =org-cite= engine (preferred one)*
 After setting =org-latex-pdf-process= variable (which is done in the
 preamble of this document
 you also need to add at the beginning of the document the following:
@@ -361,27 +362,23 @@ at the end of the file.
 
 
 
-**** Example of citing with =bibtex=-like style                :@bibtexStyle:
-Currently =bibtexStyle= is enabled.
+**** Details on implementing =purelatex=-like style
+After setting =org-latex-pdf-process= variable (which is done in the
+preamble of this document
+you only need to add:
+#+begin_src org
+  #+LATEX: \bibliographystyle{plain}
+  #+LATEX: \bibliography{refs} % where refs is a ref.bib file on your disk
+#+end_src
+at the end of the file.
+
+**** *Example of citing with =org-cite= engine (preferred one)* :@orgciteEngine:
+Currently =orgciteEngine= is enabled.
 
 After tangling bib file from section [ [bib-file-to-tangle] ]
 citations are accesible with the following style:
 
-Citations in =bibtexStyle=:
-
-Single citation \cite{orgmode}.
-
-Multiple citations: \cite{schnorr2013visualizing, Schnorr-repo} can be used.
-
-
-
-**** Example of citing with =org-cite= engine                 :@orgciteStyle:
-Currently =orgciteStyle= is enabled.
-
-After tangling bib file from section [ [bib-file-to-tangle] ]
-citations are accesible with the following style:
-
-Citations in =orgciteStyle=:
+Citations in =orgciteEngine=:
 
 Single citation [cite: @orgmode].
 
@@ -389,66 +386,42 @@ Multiple citations:  [cite: @schnorr2013visualizing; @Schnorr-repo ] can be used
 
 
 
-**** TODO Using custom bibliography styles
-Problems with reading bibliography styles from working directory.
-I just changed =elsarticle-harv= in Section into =plain=.
-
-**** ???? COMMENT Compilation process (2DELETE because it's already described in [ [sec:citation-engine] ] ??) :2DEL:
-
-***** COMMENT Settings for =bibtex= (default Schnorr's exporter)   :@bibtexStyle:2DEL:
-If you want to use default =bibtex= bibliography backend it's
-reasonable to add:
-#+begin_src elisp :eval no 
-  (setq org-latex-pdf-process '("pdflatex -interaction nonstopmode %f" "bibtex %b" "pdflatex -interaction nonstopmode %f" "pdflatex -interaction nonstopmode --synctex=-1 %f"))
-#+end_src
-
-then all 
-
-in Section ''Elsevier configuration for org export + ignore tag (Start Here)''
-(visible only in org source file, not exported in this pdf)
-in case the current value of =org-latex-pdf-process= is different.
-Otherwise you may encounter errors during compilation.
-
-
-****** Test
+**** Example of citing with =purelatex=-like style       :purelatexEngine:
+Currently =purelatexEngine= is enabled.
 
 After tangling bib file from section [ [bib-file-to-tangle] ]
 citations are accesible with the following style:
 
-Citations in =bibtexStyle=:
+Citations in =purelatexEngine=:
 
-Check this paper\cite{schnorr2013visualizing} about how you need to
-semantically aggregate data.
-This is just an example to show how Orgmode\cite{orgmode} can be used.
+Single citation \cite{orgmode}.
 
-
-***** TODO COMMENT Settings for =org-cite=:                       :@orgciteStyle:2DEL:
-
-#+begin_src emacs-lisp :eval no
-; setting latex compilation for cite-org citation approach
-(setq org-latex-pdf-process "latexmk -f -pdf -%latex -interaction=nonstopmode -output-directory=%o %f")
-;; ; ; ; ;; ;; ; ;(setq org-latex-pdf-process '("pdflatex -interaction nonstopmode %f" "bibtex %b" "pdflatex -interaction nonstopmode %f" "pdflatex -interaction nonstopmode --synctex=-1 %f"))
-#+end_src
-
-****** Test
-
-Citations in =orgciteStyle=:
-
-[cite:@orgmode]
+Multiple citations: \cite{schnorr2013visualizing, Schnorr-repo} can be used.
 
 
-*** COMMENT Dealing with internal references :2DEL:
-Reference to this section:
-1. [[sec:customization]]
 
-*** POSTPONED Other problems
-**** POSTPONED undefined references-citations warning 
+**** Using custom bibliography styles
+
+Changing bibliography style in =purelatex= engine comes down
+to changing =plain= in line =#+LATEX: \bibliographystyle{plain}=
+to the style you prefer.
+
+Changing bibliography style in =org-cite= engine comes down
+to changing =plain= in line =#+CITE_EXPORT: bibtex plain=
+to the style you prefer. You may choose the =.bst= files
+included in this repository.
+
+*** Known issues
+**** TODO ''PDF file produced with warnings [undefined reference] [undefined citation]''
 This is probably the problem with emacs, which seems to gather all
-the warnings that occur during =org-latex-pdf-process= and
-displays them after the process is finished.
+the warnings that occur during compilation described by
+
+=org-latex-pdf-process=
+
+and displays them after the process is finished.
 You may see something like:
 #+begin_src sh :eval no
-pdf file produced with warnings: [undefined reference] [undefined citattion]
+pdf file produced with warnings: [undefined reference] [undefined citation]
 #+end_src
 although all the references and citations are properly numbered.
 
@@ -467,7 +440,7 @@ pdflatex elsevier
 The above commands may also be used to check the correctness
 of the paper (last pdflatex run should raise no warnings).
 
-**** *WARNING!!!*: Conflict between =engraved= and =lineno= latex package
+**** TODO *WARNING!!!*: Conflict between =engraved= and =lineno= latex package
 By default Schnorr's template had =lineno= latex package
 included. In this way you could have lines numbered when exporting
 to pdf.
@@ -498,27 +471,20 @@ Who paid for this?
 # See next section to understand how refs.bib file is created.
 
 
-*** Citation - option 1: =bibtex=                     :ignore:@bibtexStyle:
-<<citation-bibtex-include-bibliography>>
-
-# ### MB note: uncomment two lines below if you use bibtex citation approach
-#+LATEX: \bibliographystyle{plain}
-#+LATEX: \bibliography{refs}
-  
-
-
-*** Citation - option 2: =cite-org=                  :ignore:@orgciteStyle:
+*** Citation - option 1: =cite-org=                 :ignore:@orgciteEngine:
 
 # ### MB note:  setting latex compilation for cite-org citation approach
 #+LATEX:\section*{References}
 #+PRINT_BIBLIOGRAPHY: 
 
 
+*** Citation - option 2: =purelatex=               :ignore:purelatexEngine:
+<<citation-bibtex-include-bibliography>>
 
-
-
-
-
+# ### MB note: uncomment two lines below if you use bibtex citation approach
+#+LATEX: \bibliographystyle{plain}
+#+LATEX: \bibliography{refs}
+  
 
 
 * Bib file is here                                                 :noexport:
