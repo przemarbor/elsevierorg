@@ -17,7 +17,10 @@
 
 # ##### MB note: additional tags for two alternative citation engines
 #+TAGS: { @bibtexStyle(b) @orgciteStyle(o) }
-#+EXCLUDE_TAGS: @bibtexStyle noexport
+# ##### MB note: exclude the style you do NOT want to use by adding it to EXCLUDEd_TAGS
+# #####    - if you want to use bibtex-like citing style, put @orgciteStyle in the line below
+# #####    - if you want to use org-cite citing engine, put @bibtexStyle in the line below
+#+EXCLUDE_TAGS: @orgciteStyle noexport
 #+OPTIONS: tags:nil
 
 
@@ -61,13 +64,11 @@
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
+
 #+end_src
 
-** Citation engine 
-<<sec:citation-engine>>
-*** Citation - option 1: =bibtex= 
-If you want to use standard =bibtex= citation approach you need to
-uncomment this section and section [[citation-bibtex-include-bibliography]].
+In order to be sure that the compilation process will succeed,
+it's better to explicitely define =org-latex-pdf-process= here:
 
 #+begin_src emacs-lisp :results output :session :exports both
 ; setting pdflatex process for bibtex citation approach
@@ -77,27 +78,24 @@ uncomment this section and section [[citation-bibtex-include-bibliography]].
                               "pdflatex -shell-escape -interaction=nonstopmode --synctex=-1 %f"))
 #+end_src
 
-#+RESULTS:
+** Caption of the table below the table
+Use =describe-variable= to see the details of usage of
+=org-latex-caption-above= variable (you can set ''caption above'' behaviour
+separately for different types of items (tables, images, etc.)
 
-*** Citation - option 2: =cite-org= 
-If you want to use =cite-org= citation style and approach you need to
-uncomment:
-- this section and
-- section 
+#+begin_src emacs-lisp :results output :session :exports both
+(setq org-latex-caption-above nil)
+#+end_src
 
-# ##### MB note: uncomment two lines below if you use cite-org package for citations
+** Bibliography/citation engine
+
+*** Citation - option 2: =cite-org=                  :ignore:@orgciteStyle:
+
+# ### MB note:  setting latex compilation for cite-org citation approach
 #+BIBLIOGRAPHY: ./refs.bib
 #+CITE_EXPORT: csl cissic-elsevier-american-chemical-society-without-doi.csl
 
 
-#+begin_src emacs-lisp :results output :session :exports both
-; setting latex compilation for cite-org citation approach
-(setq org-latex-pdf-process "latexmk -f -pdf -interaction=nonstopmode -shell-escape -output-directory=%o %f")
-(setq org-latex-pdf-process '("pdflatex -shell-escape -interaction=nonstopmode %f"
-                              "bibtex %b" 
-                              "pdflatex -shell-escape -interaction=nonstopmode %f" 
-                              "pdflatex -shell-escape -interaction=nonstopmode --synctex=-1 %f"))
-#+end_src
 
 * *The Paper (preamble/configurations)*                              :ignore:
 ** Latex configurations                                             :ignore:
@@ -150,14 +148,14 @@ F-38000 Grenoble -- France\\
 
 #+LaTeX: \begin{abstract}
 
-Put your abstract here.
-
 This repository is a modification of Schnorr's original document available
 on [[https://github.com/schnorr/elsevierorg][his github repository]].
-This work introduces the possibility of using the new =org-mode= way 
-of citing, namely - =org-cite=, still letting one to use classic,
+We introduce the possibility of using the new =org-mode= way 
+of citing and refering (=org-cite=, =org-ref=) , still letting one to use classic,
 more latexian =bibtex= approach. The details are explained in
 section [[sec:customization]].
+
+BTW: Put your abstract here.
 
 #+LaTeX: \end{abstract}
 
@@ -203,53 +201,208 @@ neatly used to write papers following the Elsevier latex style. Feel
 free to modify and distributed this as you wish.
 
 Be aware that this example is compatible with OrgMode 9.*.
+In fact, in my (MB) case the project is working on Org-mode 9.6,
+and Emacs 29.1.
 
 For a detailed explanation on why and how to write reproducible
 articles using OrgMode, please visit the following [[https://github.com/alegrand/RR_webinars/blob/master/1_replicable_article_laboratory_notebook/index.org][page]].
 
-** Background and Experimental Context
-\label{sec.context}
-*** Background
-\label{sec.background}
-*** Experimental Context and Workload Details
-\label{sec.setup}
-** Related Work and Motivation
-\label{sec.relatedwork}
+** Background and Experimental Context <<sec.context>>
+# THIS IS NOT NEEDED IN THIS VERSION OF THE TEMPLATE: \label{sec.context}
+*** Background <<sec.background>>
+# THIS IS NOT NEEDED IN THIS TEMPLATE: \label{sec.background}
+*** Experimental Context and Workload Details <<sec.setup>>
+# THIS IS NOT NEEDED IN THIS VERSION OF THE TEMPLATE: \label{sec.setup}
+** Related Work and Motivation <<sec.relatedwork>>
+# THIS IS NOT NEEDED IN THIS VERSION OF THE TEMPLATE: \label{sec.relatedwork}
 
 
-** Your Great Contribution to Computer Science
-\label{sec.proposal}
+** Your Great Contribution to Computer Science <<sec.proposal>>
+# THIS IS NOT NEEDED IN THIS VERSION OF THE TEMPLATE: \label{sec.proposal}
 ** Your Super Results
 ** Description of MB's Customizations  <<sec:customization>>
+*** Internal references - sections
+The first improvement over Schnorr's template is the change of way how
+references within the document are handled. Instead of using
+=\label{}= =\ref{}=
+we prefer known from =org-mode=:
+=<< >>= for labels and =[ [  ] ]= for inserting link.
+
+Of course you may still use =latex=-ian way of label/reference pairs.
+Just try to be consistent over the document. For your own sake :).
+
+**** *Example of preferred way of refering to sections*:
+This section number is [[sec:customization]].
+
+**** Example of =latex=-style label/reference scheme \label{sec:ex2}
+This section number is equal \ref{sec:ex2}.
+
+**** Example of =org-ref= =latex=-style scheme 
+You can also use =org-ref= interface to insert org-mode-buffer-clickable
+references which is far more convenient (=M-x org-ref-insert-ref-link=):
+=org-ref= reference to this section: ref:sec:ex2.
+
+*** Internal references - equations, floats 
+**** Example of floats label/reference scheme
+Depeneding on our preference we can use two ways of labeling/referencing
+to floats: 
+=latex=-like scheme or org-mode =#+NAME= tag.
+Choose the one you like more and be consistent.
+
+#+begin_export latex
+\begin{table}[htbp]
+\centering
+\begin{tabular}{rr}
+A & a\\[0pt]
+1 & 2\\[0pt]
+\end{tabular}
+\caption{label-tagged table}
+\label{tab:A}
+\end{table}
+#+end_export
+
+#+NAME:   tab:B
+#+CAPTION: =#+NAME=-tagged table
+| B | b |
+| 1 | 2 |
+
+Example:
+- Org-ref =latex=-style reference to Table: ref:tab:A, and
+- org-mode =[ [= =] ]= refrence to Table [[tab:B]]. 
+
+
+**** Example of equation label/reference scheme
+When it comes to equations there's only one working way of referencing
+to equations, since =#+NAME= labels are not working with =org-ref= for me.
+
+#+begin_export latex
+\begin{equation}
+E=mc^2
+\label{Eq:emc2-label}
+\end{equation}
+#+end_export
+
+#+NAME: Eq:emc2-name
+#+begin_export latex
+\begin{equation}
+E=mc^2
+\end{equation}
+#+end_export
+
+Example: 
+- org-ref to =\label= reference: eqref:Eq:emc2-label
+- org-ref reference to the second equation labelled by =#+NAME= tag is currently *not working* for me: ref:Eq:emc2-name
+
 *** TODO Bibliography
+When it comes to handling bibliography we also introduce some new
+features.
 
-**** Section Test                                           :@bibtexStyle:
+Firstly, we include explicit definition of latex compilation process 
+in the first section of the document in the line:
 
-lalala 
+=(setq org-latex-pdf-process ...=.
 
-**** Section Test 2                                        :@orgciteStyle:
+This is done because the original Schnorr's version of the code
+was not working properly at this part.
 
-bababa
+Secondly, we wanted to use the newer citing engine =org-cite=.
+In order to let one conveniently use any of them we decided on defining two
+local-buffer tags:
+
+=@bibtexStyle= and =@orgciteStyle=. 
+
+If you want to use one of them, you need to put the other one in the line with
+=#+EXCLUDE_TAGS:= (the beginning of this file).
+
+\noindent *COMMENT*: Do remember to put excluded tag *before* =noexport= tag
+(It does not work otherwise.).
+
+Do decide which citing method you prefer, put appropriate (the other
+one to decided on) tag in =#+EXCLUDE_TAGS:=, and cite bibliography
+items as it is presented below.
+
+*VERY IMPORTANT COMMENT!!!*:
+
+We prefer using =org-cite= engine.
+It is the newest approach,
+it is built-in into org-mode,
+and seems to be more prospective than =org-ref=. 
+
+After invoking =M-x org-cite-insert= a new buffer appears with
+the list of all your bibliography items defined in
+your bib-file. You can conveniently select appropriate one from the list.
+This feature is not available for =bibtex=-like style.
+
+**** Details on implementing =bibtex=-like style
+After setting =org-latex-pdf-process= variable (which is done in the
+preamble of this document
+you only need to add:
+#+begin_src org
+  #+LATEX: \bibliographystyle{plain}
+  #+LATEX: \bibliography{refs} % where refs is a ref.bib file on your disk
+#+end_src
+at the end of the file.
+
+**** Details on implementing =org-cite= engine
+After setting =org-latex-pdf-process= variable (which is done in the
+preamble of this document
+you also need to add at the beginning of the document the following:
+#+begin_src org
+  ,#+BIBLIOGRAPHY: ./refs.bib
+  ,#+CITE_EXPORT: csl elsevier-american-chemical-society-without-doi.csl
+#+end_src
+and
+#+begin_src org
+  ,#+LATEX:\section*{References}
+  ,#+PRINT_BIBLIOGRAPHY: 
+#+end_src
+at the end of the file.
+
+
+
+
+**** Example of citing with =bibtex=-like style                :@bibtexStyle:
+Currently =bibtexStyle= is enabled.
+
+After tangling bib file from section [ [bib-file-to-tangle] ]
+citations are accesible with the following style:
+
+Citations in =bibtexStyle=:
+
+Single citation \cite{orgmode}.
+
+Multiple citations: \cite{schnorr2013visualizing, Schnorr-repo} can be used.
+
+
+
+**** Example of citing with =org-cite= engine                 :@orgciteStyle:
+Currently =orgciteStyle= is enabled.
+
+After tangling bib file from section [ [bib-file-to-tangle] ]
+citations are accesible with the following style:
+
+Citations in =orgciteStyle=:
+
+Single citation [cite: @orgmode].
+
+Multiple citations:  [cite: @schnorr2013visualizing; @Schnorr-repo ] can be used.
+
+
 
 **** TODO Using custom bibliography styles
 Problems with reading bibliography styles from working directory.
 I just changed =elsarticle-harv= in Section into =plain=.
 
-**** Compilation process (2DELETE because it's already described in [ [sec:citation-engine] ] ??)
+**** ???? COMMENT Compilation process (2DELETE because it's already described in [ [sec:citation-engine] ] ??) :2DEL:
 
-***** Settings for =bibtex= (default Schnorr's exporter)   :@bibtexStyle:
+***** COMMENT Settings for =bibtex= (default Schnorr's exporter)   :@bibtexStyle:2DEL:
 If you want to use default =bibtex= bibliography backend it's
 reasonable to add:
 #+begin_src elisp :eval no 
   (setq org-latex-pdf-process '("pdflatex -interaction nonstopmode %f" "bibtex %b" "pdflatex -interaction nonstopmode %f" "pdflatex -interaction nonstopmode --synctex=-1 %f"))
 #+end_src
 
-then all you need to do is to add:
-#+begin_src org
-  #+LATEX: \bibliographystyle{plain}
-  #+LATEX: \bibliography{refs} % where refs is a ref.bib file on your disk
-#+end_src
-at the end of the file.
+then all 
 
 in Section ''Elsevier configuration for org export + ignore tag (Start Here)''
 (visible only in org source file, not exported in this pdf)
@@ -269,7 +422,7 @@ semantically aggregate data.
 This is just an example to show how Orgmode\cite{orgmode} can be used.
 
 
-***** TODO Settings for =org-cite=:                       :@orgciteStyle:
+***** TODO COMMENT Settings for =org-cite=:                       :@orgciteStyle:2DEL:
 
 #+begin_src emacs-lisp :eval no
 ; setting latex compilation for cite-org citation approach
@@ -284,7 +437,7 @@ Citations in =orgciteStyle=:
 [cite:@orgmode]
 
 
-*** Dealing with internal references
+*** COMMENT Dealing with internal references :2DEL:
 Reference to this section:
 1. [[sec:customization]]
 
@@ -314,18 +467,18 @@ pdflatex elsevier
 The above commands may also be used to check the correctness
 of the paper (last pdflatex run should raise no warnings).
 
-**** COMMENT WARNING!!!: Conflict between =engraved= and =lineno= latex package
-# By default Schnorr's template had =lineno= latex package
-# included. In this way you could have lines numbered when exporting
-# to pdf.
-# However there exist some conflict between =lineno= and =engraved=
-# listing backend for org-mode which I'm currently using.
-# That's why lines with =lineno= needs to be commented out from
-# the preamble of this file.
+**** *WARNING!!!*: Conflict between =engraved= and =lineno= latex package
+By default Schnorr's template had =lineno= latex package
+included. In this way you could have lines numbered when exporting
+to pdf.
+However there exist some conflict between =lineno= and =engraved=
+listing backend for org-mode which I'm currently using.
+That's why lines with =lineno= needs to be commented out from
+the preamble of this file.
 
-# It should be noted, that it can be reenabled if you write
-# a document without =#+begin_src= blocks (or if you
-# use other listings backends (minted, verbatim...).
+It should be noted, that it can be reenabled if you write
+a document without =#+begin_src= blocks (or if you
+use other listings backends (minted, verbatim...).
 
 
 
