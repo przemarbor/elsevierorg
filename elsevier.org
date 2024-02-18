@@ -339,9 +339,12 @@ It is the newest approach,
 it is built-in into org-mode,
 and seems to be more prospective than =org-ref=. 
 
-After invoking =M-x org-cite-insert= a new buffer appears with
+After invoking =M-x org-cite-insert= (=C-c C-x @=)
+a new buffer appears with
 the list of all your bibliography items defined in
 your bib-file. You can conveniently select appropriate one from the list.
+Then you need to confirm selected list by =C-M-j= keystroke
+(solution found [[https://www.reddit.com/r/orgmode/comments/q58f4f/how_to_actually_insert_a_citation_with_orgcite/][here]]).
 This feature is not available for =bibtex=-like style.
 
 **** *Details on implementing =org-cite= engine (preferred one)*
