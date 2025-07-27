@@ -343,8 +343,15 @@ After invoking =M-x org-cite-insert= (=C-c C-x @=)
 a new buffer appears with
 the list of all your bibliography items defined in
 your bib-file. You can conveniently select appropriate one from the list.
-Then you need to confirm selected list by =C-M-j= keystroke
-(solution found [[https://www.reddit.com/r/orgmode/comments/q58f4f/how_to_actually_insert_a_citation_with_orgcite/][here]]).
+Then you need to confirm selected list by proper keystroke ([[https://www.reddit.com/r/orgmode/comments/q58f4f/how_to_actually_insert_a_citation_with_orgcite/][link]]).
+It may be: 
+- =C-M-j= or
+- =C-RET= or
+- =M+RET=
+and it depends on completion framework you use (=helm=, =ivy=,
+=Selectrum= -> =Vertico=).
+
+  
 This feature is not available for =bibtex=-like style.
 
 **** *Details on implementing =org-cite= engine (preferred one)*
@@ -406,11 +413,18 @@ Multiple citations: \cite{schnorr2013visualizing, Schnorr-repo} can be used.
 **** Using custom bibliography styles
 
 Changing bibliography style in =purelatex= engine comes down
-to changing =plain= in line =#+LATEX: \bibliographystyle{plain}=
+to changing =plain= in line
+
+=#+LATEX: \bibliographystyle{plain}=
+
+
 to the style you prefer.
 
 Changing bibliography style in =org-cite= engine comes down
-to changing =plain= in line =#+CITE_EXPORT: bibtex plain=
+to changing =plain= in line
+
+=#+CITE_EXPORT: bibtex plain=
+
 to the style you prefer. You may choose the =.bst= files
 included in this repository.
 
@@ -459,10 +473,101 @@ use other listings backends (minted, verbatim...).
 
 
 
+** The examples
+Usually when writing a paper you need to:
+
+*** write equations
+Press =Ctrl+C Ctrl+, l= to insert
+
+=#+begin_export latex=
+
+=#+end_export=
+
+Inside this environment you can use any of latex commands, particularly:
+
+=\begin{equation} \end{equation}=
+
+Do remember to add command =\label= when needed!
+
+#+begin_export latex
+\begin{equation}
+E = ma
+\label{Eq:Newton}
+\end{equation}
+#+end_export
+
+*** Cite equation/formula
+
+After typing
+=Alt-x org-ref-insert-ref-link=
+new buffer appears where you can look for the label
+you are interested to insert. 
+
+For example here we insert the reference to the equation from the section
+above: This is Eq. eqref:Eq:Newton.
+
+*** cite from bibligraphy
+Type
+=Alt-x org-cite-insert= (or =Ctrl-c Ctrl-x @=)
+to invoke the list of bibliography items.
+
+Choose the appropriate item, press =Enter= (you can choose
+many items at once), theb type =Ctrl+Alt+j= to
+approve it. [cite:@schnorr2013visualizing]
+
+*** Include a block of code
+This is an example of octave code and the result of its evaluation.
+
+#+begin_src octave :results output :exports both :session *PY*
+  x = linspace(-1,1,101) ;
+  a = 2 ;
+  b = a
+#+end_src
+
+
+*** Include a picture
+This is how we can generate some figure and include it right
+after the block of code:
+#+begin_src octave :session *PY* :exports both :results file :cache yes
+  y = x.^2 ;
+  plot(x,y) ;
+  print -dpng ./images/fig1.png;
+  close all
+  ans = "./images/fig1.png";
+#+end_src
+
+#+RESULTS[40f502a4c595165a0220d4433dea51121521d2c2]:
+[[file:./images/fig1.png]]
+
+
+Usually we would like to include this picture in the normal org-mode way
+(using =[[   ]]=:
+
+
+#+CAPTION: This is a caption.
+#+LABEL: fig-examp
+[[./images/fig1.png]]
+
+
+#+CAPTION: This is another caption.
+#+LABEL: fig-examp2
+[[./images/fig1.png]]
+
+
+Similarly to quoting equations we can get the label refering
+to the picture with the use of
+
+=Alt-x org-ref-insert-ref-link=.
+
+Heew are the references to the last two figures:
+Figure [[fig-examp]],
+Figure [[fig-examp2]].
+
 
 ** Conclusions
 
 ** Acknowledgments                                                  :ignore:
+
 
 #+LATEX:\section*{Acknowledgements}
 
